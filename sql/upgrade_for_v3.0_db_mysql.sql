@@ -1,6 +1,11 @@
 -- Upgrade for v2.0
 -- MySQL db scripts
 
-
+ALTER TABLE ngLog CHANGE COLUMN url  uri varchar(256);
+ALTER TABLE ngLog ADD COLUMN method VARCHAR(8) AFTER ip;
+ALTER TABLE ngLog ADD COLUMN bodyBytes INT UNSIGNED AFTER status;
+ALTER TABLE ngLog ADD COLUMN referrer VARCHAR(256) AFTER bodyBytes;
+ALTER TABLE ngLog ADD COLUMN userAgent VARCHAR(256) AFTER referrer;
+ALTER TABLE ngLog ADD COLUMN os  VARCHAR(32) AFTER userAgent;
 
 

@@ -1,7 +1,7 @@
 CREATE TABLE ngLog (
   reqTime DATETIME NOT NULL ,
   ip VARCHAR(16) NOT NULL ,
-  method VARCHAR(16) ,
+  method VARCHAR(8) ,
   uri VARCHAR(512) ,
   status VARCHAR(8),
   bodyBytes int UNSIGNED,
