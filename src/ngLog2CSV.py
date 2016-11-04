@@ -48,66 +48,81 @@ re_ngLog = re.compile(r"(%s)\ -\ -\ (%s)\ (%s)\ (%s)\ (%s)\ (%s)\ (%s)"
 
 out = open(r'ngLogFiltered.csv', 'wb')
 
+excludesStart = ["/hyc-app/api", "/wap/common/images", "/upload", "/static"]
+excludesEnd = ["ico", "gif", "jpg", "png", "css", "do", "js", "inc", "json", "xml"]
 with open(logFile, 'r') as f:
     while True:
         try:
             line = f.readline()
             if not line:
                 break
-
             sp = line.split()
             url = sp[6]
-            found = not url.startswith(r"/static")
-            print(line)
+            found = False
+            for k, v in enumerate(excludesStart):
+                if url.startswith(v):
+                    found = True
+                    break
             if found:
-                match = re_ngLog.match(line)
-                # if match is not None:
-                if match is not None:
-                    grps = match.groups()
-                    ip = grps[0]
-                    reqTime = grps[1]
-                    request = grps[2]
-                    status = grps[3]
-                    bodyBytes = grps[4]
-                    referrer = grps[5]
-                    userAgent = grps[6]
-                    # format the date
-                    reqTime = reqTime[1:-7]
-                    t = time.strptime(reqTime, "%d/%b/%Y:%H:%M:%S")
-                    reqTime = time.strftime("%Y-%m-%d %X", t)
+                continue
 
-                    # get rid of " "
-                    request = request[1: -1]
-                    req = request.split(" ")
-                    method = req[0]
-                    if len(req) > 1:
-                        uri = req[1]
+            for k, v in enumerate(excludesEnd):
+                if url.endswith(v):
+                    found = True
+                    break
+            if found:
+                continue
 
-                    referrer = referrer[1:-1]
-                    # userAgent = userAgent[1:-1]
+            print(line)
 
-                    if len(userAgent) > 20:
-                        userInfo = userAgent.split(' ')
-                        userKernel = userInfo[0]
-                        try:
-                            userSystem = re_us.findall(userAgent)
-                            userSystem = userSystem[0]
-                            userSystem = userSystem[1:-1]
-                            # print(userSystem)
-                            ub = re_ub.findall(userAgent)
-                            ub = ub[1]
-                            userBrowser = ub.replace('"', '')
+            match = re_ngLog.match(line)  # if match is not None:
+            if match is not None:
+                grps = match.groups()
+                ip = grps[0]
+                reqTime = grps[1]
+                request = grps[2]
+                status = grps[3]
+                bodyBytes = grps[4]
+                referrer = grps[5]
+                userAgent = grps[6]
+                # format the date
+                reqTime = reqTime[1:-7]
+                t = time.strptime(reqTime, "%d/%b/%Y:%H:%M:%S")
+                reqTime = time.strftime("%Y-%m-%d %X", t)
 
-                            lst = [reqTime, ip, method, uri, status, bodyBytes, referrer, userAgent, userSystem, userBrowser]
-                        except IndexError:
-                            lst = [reqTime, ip, method, uri, status, bodyBytes, referrer, userAgent, "", ""]
+                # get rid of " "
+                request = request[1: -1]
+                req = request.split(" ")
+                method = req[0]
+                if len(req) > 1:
+                    uri = req[1]
 
-                    else:
+                referrer = referrer[1:-1]
+                # userAgent = userAgent[1:-1]
+
+                if len(userAgent) > 20:
+                    userInfo = userAgent.split(' ')
+                    userKernel = userInfo[0]
+                    try:
+                        userSystem = re_us.findall(userAgent)
+                        userSystem = userSystem[0]
+                        userSystem = userSystem[1:-1]
+                        # print(userSystem)
+                        ub = re_ub.findall(userAgent)
+                        ub = ub[1]
+                        userBrowser = ub.replace('"', '')
+
+                        lst = [reqTime, ip, method, uri, status, bodyBytes, referrer, userAgent, userSystem,
+                               userBrowser]
+                    except IndexError:
                         lst = [reqTime, ip, method, uri, status, bodyBytes, referrer, userAgent, "", ""]
 
-                    line = ''.join((e + '\t') for e in lst)
-                    line = line + '\n'
-                    out.writelines(line)
+                else:
+                    lst = [reqTime, ip, method, uri, status, bodyBytes, referrer, userAgent, "", ""]
+
+                line = ''.join((e + '\t') for e in lst)
+                line = line + '\n'
+                out.writelines(line)
         finally:
             pass
 out.close()
