@@ -50,6 +50,7 @@ out = open(r'ngLogFiltered.csv', 'wb')
 
 excludesStart = ["/hyc-app/api", "/wap/common/images", "/upload", "/static"]
 excludesEnd = ["ico", "gif", "jpg", "png", "css", "do", "js", "inc", "json", "xml"]
+
 with open(logFile, 'r') as f:
     while True:
         try:
@@ -121,7 +122,7 @@ with open(logFile, 'r') as f:
                     lst = [reqTime, ip, method, uri, status, bodyBytes, referrer, userAgent, "", ""]
 
                 line = ''.join((e + '\t') for e in lst)
-                line = line + '\n'
+                line += '\n'
                 out.writelines(line)
         finally:
             pass

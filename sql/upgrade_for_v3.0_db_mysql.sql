@@ -1,4 +1,4 @@
--- Upgrade for v2.0
+-- Upgrade for v3.0
 -- MySQL db scripts
 
 ALTER TABLE ngLog CHANGE COLUMN url  uri varchar(256);
